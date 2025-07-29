@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BACKEND_URL } from "../config.js";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -11,7 +12,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3000/api/users/login", {
+      const res = await fetch(`${BACKEND_URL}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

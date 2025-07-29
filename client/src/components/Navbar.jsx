@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../config.js";
 
 const Navbar = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -7,7 +8,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/users/profile", {
+    fetch(`${BACKEND_URL}/api/users/profile`, {
       method: "GET",
       credentials: "include",
     })
@@ -24,7 +25,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/users/logout", {
+      const res = await fetch(`${BACKEND_URL}/api/users/logout`, {
         method: "POST",
         credentials: "include",
       });

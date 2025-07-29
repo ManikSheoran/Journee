@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import EEme from "./Eeme.jsx";
+import { BACKEND_URL } from "../config.js";
 
 function Journal() {
   const [searchParams] = useSearchParams();
@@ -25,7 +26,7 @@ function Journal() {
     if (!date) return;
 
     setLoading(true);
-    fetch(`http://localhost:3000/api/users/journal?q=${date}`, {
+    fetch(`${BACKEND_URL}/api/users/journal?q=${date}`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -63,7 +64,7 @@ function Journal() {
       return;
     }
 
-    fetch(`http://localhost:3000/api/users/journal?q=${date}`, {
+    fetch(`${BACKEND_URL}/api/users/journal?q=${date}`, {
       method: journal ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

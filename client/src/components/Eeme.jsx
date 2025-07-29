@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
+import { BACKEND_URL } from "../config.js";
 
 const samplePrompts = [
   "Analyze my day",
@@ -27,7 +28,7 @@ const Eeme = ({ date }) => {
     setShowSuggestions(false);
 
     try {
-      const res = await fetch("http://localhost:3000/api/ai", {
+      const res = await fetch(`${BACKEND_URL}/api/ai`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

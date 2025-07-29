@@ -11,13 +11,14 @@ import Register from "./components/Register.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Main from "./components/Main.jsx";
 import { useState, useEffect } from "react";
+import { BACKEND_URL } from "./config.js";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/users/profile", {
+    fetch(`${BACKEND_URL}/api/users/profile`, {
       method: "GET",
       credentials: "include",
     })
@@ -57,9 +58,7 @@ function App() {
           />
           <Route
             path="/home"
-            element={ 
-              currentUser ? <Navigate to="/" replace /> : <Main />
-            }
+            element={currentUser ? <Navigate to="/" replace /> : <Main />}
           />
           <Route
             path="/journal"

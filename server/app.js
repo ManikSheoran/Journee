@@ -25,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/journal', {
 });
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../config.js";
 
 const Navbar = () => {
@@ -78,18 +78,18 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="text-sm font-medium text-[#03A6A1] hover:text-[#ff4f0f] transition"
               >
                 Login
-              </a>
-              <a
-                href="/register"
+              </Link>
+              <Link
+                to="/register"
                 className="bg-[#03A6A1] hover:bg-[#028985] text-white font-semibold px-4 py-2 rounded-full text-sm shadow transition"
               >
                 Sign Up
-              </a>
+              </Link>
             </>
           )}
         </div>

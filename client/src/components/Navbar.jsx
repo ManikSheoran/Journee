@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import axios from "axios";
 import { BACKEND_URL } from "../config.js";
 
 const Navbar = () => {
@@ -10,49 +8,33 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get(`${BACKEND_URL}/api/users/profile`, {
-          withCredentials: true,
-        });
-        if (res.data?.user) setCurrentUser(res.data.user);
-      } catch (err) {
-        if (err.response?.status !== 401) {
-          console.error("Failed to fetch user status:", err);
-        }
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get(`${BACKEND_URL}/api/users/profile`, {
-          withCredentials: true,
-        });
-        if (res.data?.user) setCurrentUser(res.data.user);
-      } catch (err) {
-        if (err.response?.status !== 401) {
-          console.error("Failed to fetch user status:", err);
-        }
+    fetch(`${BACKEND_URL}/api/users/profile`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) setCurrentUser(data.user);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user status:", err);
         setCurrentUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/api/users/logout`, null, {
-        withCredentials: true,
-      await axios.post(`${BACKEND_URL}/api/users/logout`, null, {
-        withCredentials: true,
+      const res = await fetch(`${BACKEND_URL}/api/users/logout`, {
+        method: "POST",
+        credentials: "include",
       });
-      setCurrentUser(null);
-      // Using window.location.href to ensure a full page reload, which clears all state.
-      window.location.href = "/login";
+      if (res.ok) {
+        setCurrentUser(null);
+        navigate("/login");
+      } else {
+        alert("Logout failed. Please try again.");
+      }
     } catch (error) {
       console.error("Error during logout:", error);
       alert("An error occurred during logout.");

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import axios from "axios";
 import { BACKEND_URL } from "../config.js";
 
 const Navbar = () => {
@@ -19,7 +20,22 @@ const Navbar = () => {
         if (err.response?.status !== 401) {
           console.error("Failed to fetch user status:", err);
         }
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/users/profile`, {
+          withCredentials: true,
+        });
+        if (res.data?.user) setCurrentUser(res.data.user);
+      } catch (err) {
+        if (err.response?.status !== 401) {
+          console.error("Failed to fetch user status:", err);
+        }
         setCurrentUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
       } finally {
         setLoading(false);
       }
@@ -29,6 +45,8 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
+      await axios.post(`${BACKEND_URL}/api/users/logout`, null, {
+        withCredentials: true,
       await axios.post(`${BACKEND_URL}/api/users/logout`, null, {
         withCredentials: true,
       });

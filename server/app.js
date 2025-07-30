@@ -24,8 +24,19 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/journal', {
   console.error('❌ Failed to connect to MongoDB', err);
 });
 
+const allowedOrigins = [
+  'https://journee-seven.vercel.app', 
+  'http://localhost:5173',
+];
+
 const corsOptions = {
-  origin: '*',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
@@ -47,7 +58,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000, 
     },
   })

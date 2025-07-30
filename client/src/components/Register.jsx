@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { BACKEND_URL } from "../config.js";
 
 function Register() {
@@ -17,23 +18,20 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     try {
-      const res = await fetch(`${BACKEND_URL}/api/users/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(form),
+      await axios.post(`${BACKEND_URL}/api/users/register`, form, {
+        withCredentials: true,
       });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        navigate("/");
-      } else {
-        setError(data.message || "Registration failed");
-      }
+      navigate("/");
     } catch (err) {
-      setError("Network error. Try again.");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.request) {
+        setError("Network error. Please try again.");
+      } else {
+        setError("An unexpected error occurred during registration.");
+      }
     }
   };
 

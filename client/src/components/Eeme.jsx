@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
+import axios from "axios";
 import { BACKEND_URL } from "../config.js";
 
 const samplePrompts = [
@@ -22,31 +23,32 @@ const Eeme = ({ date }) => {
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-    setMessages((prev) => [...prev, { from: "user", text: input }]);
+
+    const userMessage = { from: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
     setInput("");
     setLoading(true);
     setShowSuggestions(false);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/ai`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, prompt: input }),
-      });
-      const data = await res.json();
-      setMessages((prev) => [
-        ...prev,
-        {
-          from: "ai",
-          text: data.response || "Sorry, I couldn't process that.",
-        },
-      ]);
+      const res = await axios.post(
+        `${BACKEND_URL}/api/ai`,
+        { date, prompt: currentInput },
+        { withCredentials: true }
+      );
+      const aiMessage = {
+        from: "ai",
+        text: res.data.response || "Sorry, I couldn't process that.",
+      };
+      setMessages((prev) => [...prev, aiMessage]);
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        { from: "ai", text: "Error: Unable to reach AI server." },
-      ]);
+      let errorMessage = "Error: Unable to reach AI server.";
+      if (err.response?.data?.message) {
+        errorMessage = `Error: ${err.response.data.message}`;
+      }
+      const aiErrorMessage = { from: "ai", text: errorMessage };
+      setMessages((prev) => [...prev, aiErrorMessage]);
     } finally {
       setLoading(false);
     }

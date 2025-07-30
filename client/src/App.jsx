@@ -10,6 +10,7 @@ import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Main from "./components/Main.jsx";
+import axios from "axios";
 import { useState, useEffect } from "react";
 import { BACKEND_URL } from "./config.js";
 
@@ -18,23 +19,28 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/users/profile`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data && data.user) {
-          setCurrentUser(data.user);
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/users/profile`, {
+          withCredentials: true,
+        });
+        if (res.data && res.data.user) {
+          setCurrentUser(res.data.user);
         } else {
+
           setCurrentUser(null);
         }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch user status:", err);
+      } catch (err) {
+        if (err.response?.status !== 401) {
+          console.error("Failed to fetch user status:", err);
+        }
         setCurrentUser(null);
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   if (loading) {

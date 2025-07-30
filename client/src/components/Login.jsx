@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BACKEND_URL } from "../config.js";
+import axios from "axios";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -11,22 +12,20 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     try {
-      const res = await fetch(`${BACKEND_URL}/api/users/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(form),
+      await axios.post(`${BACKEND_URL}/api/users/login`, form, {
+        withCredentials: true,
       });
-
-      const data = await res.json();
-      if (res.ok) {
-        window.location.href = "/";
-      } else {
-        setError(data.message || "Login failed");
-      }
+      window.location.href = "/";
     } catch (err) {
-      setError("Network error. Try again.");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.request) {
+        setError("Network error. Please try again.");
+      } else {
+        setError("An unexpected error occurred during login.");
+      }
     }
   };
 

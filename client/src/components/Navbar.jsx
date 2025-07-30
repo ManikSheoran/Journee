@@ -31,7 +31,7 @@ const Navbar = () => {
       });
       if (res.ok) {
         setCurrentUser(null);
-        navigate("/login");
+        window.location.href = "/";
       } else {
         alert("Logout failed. Please try again.");
       }

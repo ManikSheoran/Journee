@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 import EEme from "./Eeme.jsx";
 import { BACKEND_URL } from "../config.js";
 
@@ -23,27 +24,34 @@ function Journal() {
   ];
 
   useEffect(() => {
-    if (!date) return;
+    const fetchJournal = async () => {
+      if (!date) {
+        setLoading(false);
+        return;
+      }
 
-    setLoading(true);
-    fetch(`${BACKEND_URL}/api/users/journal?q=${date}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.journal) {
-          setJournal(data.journal);
+      setLoading(true);
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/users/journal?q=${date}`, {
+          withCredentials: true,
+        });
+        if (res.data.journal) {
+          setJournal(res.data.journal);
           setForm({
-            content: data.journal.content,
-            mood: data.journal.mood,
-            todos: data.journal.todos || [],
+            content: res.data.journal.content,
+            mood: res.data.journal.mood,
+            todos: res.data.journal.todos || [],
           });
         } else {
           setJournal(null);
         }
-      })
-      .catch((err) => setError("Failed to fetch journal: " + err.message))
-      .finally(() => setLoading(false));
+      } catch (err) {
+        setError("Failed to fetch journal: " + (err.response?.data?.message || err.message));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJournal();
   }, [date]);
 
   const handleChange = (e) => {

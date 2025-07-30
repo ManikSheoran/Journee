@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { BACKEND_URL } from "../config.js";
 
 const Navbar = () => {
@@ -8,33 +9,31 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/users/profile`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.user) setCurrentUser(data.user);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch user status:", err);
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/users/profile`, {
+          withCredentials: true,
+        });
+        if (res.data?.user) setCurrentUser(res.data.user);
+      } catch (err) {
+        if (err.response?.status !== 401) {
+          console.error("Failed to fetch user status:", err);
+        }
         setCurrentUser(null);
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
   }, []);
 
   const handleLogout = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/api/users/logout`, {
-        method: "POST",
-        credentials: "include",
+      await axios.post(`${BACKEND_URL}/api/users/logout`, null, {
+        withCredentials: true,
       });
-      if (res.ok) {
-        setCurrentUser(null);
-        navigate("/login");
-      } else {
-        alert("Logout failed. Please try again.");
-      }
+      setCurrentUser(null);
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error during logout:", error);
       alert("An error occurred during logout.");

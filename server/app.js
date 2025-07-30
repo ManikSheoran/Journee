@@ -1,8 +1,10 @@
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env' });
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const dotenv = require('dotenv');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require('./config/passport.js');
@@ -11,14 +13,10 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
 const aiRoutes = require('./routes/ai');
 
-dotenv.config({ path: './.env' });
-
 const app = express();
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/journal', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
   console.log('✅ Connected to MongoDB');
 }).catch((err) => {
   console.error('❌ Failed to connect to MongoDB', err);
@@ -75,7 +73,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/ai', aiRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
